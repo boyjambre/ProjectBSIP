@@ -1,0 +1,8 @@
+# Mengabaikan node_modules di root
+node_modules/
+
+# Mengabaikan node_modules di folder backend
+backend/node_modules/
+
+# Mengabaikan node_modules di folder frontend
+frontend/node_modules/
