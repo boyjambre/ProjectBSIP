@@ -1,25 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 const DataTable = () => {
   const [data, setData] = useState([]);
-  
+
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/get-data');
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5000/api/iklim/search", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       if (response.ok) {
         const result = await response.json();
-        setData(result);  
+        setData(result);
       } else {
-        console.error('Failed to fetch data');
+        console.error("Failed to fetch data");
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, []); 
+  }, []);
 
   return (
     <div className="overflow-auto mt-5">
@@ -37,7 +43,7 @@ const DataTable = () => {
           </tr>
         </thead>
         <tbody>
-          {data.map(item => (
+          {data.map((item) => (
             <tr key={item._id}>
               <td>{new Date(item.TANGGAL).toLocaleDateString()}</td>
               <td>{item.TX}</td>
