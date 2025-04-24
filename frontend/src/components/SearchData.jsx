@@ -17,13 +17,21 @@ const SearchData = () => {
     hasPrev: false,
   });
   const [error, setError] = useState("");
-  const [stations, setStations] = useState([]); 
-  
+  const [stations, setStations] = useState([]);
+
   useEffect(() => {
     // Fetch station names when the component mounts
     const fetchStations = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/iklim/stations");
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "http://localhost:5000/api/iklim/stations",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setStations(response.data.stations); // Populate the stations array with data
       } catch (err) {
         console.error("Error fetching station names:", err);
@@ -38,9 +46,13 @@ const SearchData = () => {
       setLoading(true);
       setError("");
 
+      const token = localStorage.getItem("token");
       const response = await axios.get(
         "http://localhost:5000/api/iklim/search",
         {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           params: {
             stasiun: stationName,
             startDate,
@@ -69,13 +81,17 @@ const SearchData = () => {
 
   const handleExportExcel = async () => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.get(
         "http://localhost:5000/api/iklim/export/excel",
         {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           params: {
             stasiun: stationName,
-            startDate: startDate,  // Should be in the format YYYY-MM-DD
-            endDate: endDate,      // Should be in the format YYYY-MM-DD
+            startDate: startDate, // Should be in the format YYYY-MM-DD
+            endDate: endDate, // Should be in the format YYYY-MM-DD
             page: 1,
             limit: 1000, // Adjust according to the number of records you want to export
           },
@@ -93,19 +109,23 @@ const SearchData = () => {
       setError("Gagal mengekspor Excel");
       console.error("Error:", err);
     }
-  };    
+  };
 
   const handleExportPDF = async () => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.get(
         "http://localhost:5000/api/iklim/export/pdf",
         {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           params: {
             stasiun: stationName,
-            startDate: startDate,  // Tambahkan startDate
-            endDate: endDate,      // Tambahkan endDate
+            startDate: startDate, // Tambahkan startDate
+            endDate: endDate, // Tambahkan endDate
             page: 1,
-            limit: 1000,           // Sesuaikan limit sesuai kebutuhan
+            limit: 1000, // Sesuaikan limit sesuai kebutuhan
           },
           responseType: "blob",
         }
@@ -123,7 +143,6 @@ const SearchData = () => {
     }
   };
 
-  
   return (
     <div className="flex flex-col items-center justify-center p-6">
       <div className="w-full md:w-1/2 bg-white shadow-lg rounded-lg p-6">
@@ -144,24 +163,24 @@ const SearchData = () => {
         </div>
 
         <div className="mb-4">
-      <label className="block text-sm font-medium">No/Nama Stasiun</label>
-      <select
-        value={stationName}
-        onChange={(e) => setStationName(e.target.value)}  // Update state when user selects a station
-        className="w-full p-2 border border-gray-300 rounded"
-      >
-        <option value="">Pilih Stasiun</option>
-        {stations.length > 0 ? (
-          stations.map((station, index) => (
-            <option key={index} value={station}>
-              {station}
-            </option>
-          ))
-        ) : (
-          <option value="">Loading...</option> // In case stations are still being fetched
-        )}
-      </select>
-    </div>
+          <label className="block text-sm font-medium">No/Nama Stasiun</label>
+          <select
+            value={stationName}
+            onChange={(e) => setStationName(e.target.value)} // Update state when user selects a station
+            className="w-full p-2 border border-gray-300 rounded"
+          >
+            <option value="">Pilih Stasiun</option>
+            {stations.length > 0 ? (
+              stations.map((station, index) => (
+                <option key={index} value={station}>
+                  {station}
+                </option>
+              ))
+            ) : (
+              <option value="">Loading...</option> // In case stations are still being fetched
+            )}
+          </select>
+        </div>
 
         <div className="mb-4">
           <label className="block text-sm font-medium">Parameter</label>
